@@ -126,4 +126,174 @@ divs.forEach(div => {console.log(div)}) //will not be able to iterate over divs 
 
 /*
   CREATING AND MODIFYING HTML ELEMENTS 
+
+  can dynamically create static html with javascript and put them where on the page that i like.  
+
+  to create a new element, use document.createElement('div'). can create elements using whatever tag, by passing in the string, ie a div.
+  app stores the div in a variable called newPost. newPost will be created as on object, so i can modify its properties  for example, its
+  class. 
  */
+const newPost = document.createElement('div')                  //creates new document with div tag and storing in variable newPost
+newPost.className = 'top-post'                                 //accessing properties, creating class called 'top-post'
+newPost.innerHTML = "<strong>This is a new post</strong>"      //adding html within post with strong tags
+document.body.append(newPost)                                 //add element to bottom of html document
+document.body.prepend(newPost)                                //add element to top of html document
+
+/* to add element to a specific location on the page, say right below the header, 1st need to query the element where i want to place 
+  the element. to place the post below the header, either query for the header or the 1st post. querySelector() returns the 1st 
+  element based upon the selector provided. 
+*/
+const post = document.querySelector('.post')                 //returns the 1st post element. 
+post.prepend(newPost)                                        //appends text 'This is a new post' above the 1st post. 
+
+/*Challenge:
+1. Update text in the mini-browser to match the title of this cast
+2. Create an h2 with class 'tagline' and text "I can create HTML elements!"
+Add it right under the modified text.
+*/
+const title = document.querySelector('h1') 
+title.innerHTML = "Creating and modifying HTML elements" 
+
+const tagline = document.createElement('h2') 
+tagline.className = 'tagline' 
+tagline.innerHTML = 'I can create HTML elements!' 
+
+title.append(tagline) 
+
+/*DYNAMICALLY ADD CSS STYLES 
+ 
+  reads an elements CSS style 
+
+  can use the object to modify as need. can change virtually any CSS property
+
+  from the style object, can set the CSS flex or none display property 
+
+  any CSS property that I am updating, be sure to express properties camelCase:  post.style.backgroundColor = 'orange'
+  do not express properties in the normal CSS properties naming convention: post.style.background-color = 'orange'
+  camelCase conforms to javascript standards. 
+
+  make sure the value provided is a string: post.style.margin = '30px' 
+
+  to read a class from post element, 
+  to manage a class, like remove the post class, do not use className, use classList 
+
+*/
+const post = document.querySelector(".post")   //reads and elements CSS style.
+console.log(post.style)     //returns CSSStyleDeclaration, which isn't helpful. can use object to modify 
+
+post.style.display = 'flex'  //from the style object, can set the CSS display property to flex or none (none will hide post entirely)
+post.style.background = 'orange' //change background property to orange 
+
+console.log(post.className)     //returns all of the class names as a string. returns what is in the DOM, which is post 
+post.classList.remove('post')   //removes post class. text for 1st post will change from green to black  
+post.classList.add('post')      //adds back the post class. text for 1st post will change from black to green
+post.classList.toggle('post')   //toggle method allows me to add a class then remove it immediately afterwards or vice versa. alternative approach of performing add and remove
+
+/*WORKING WITH AND UNDERSTANDING EVENTS
+
+the click event is probably the most important when working/developing applications. other valuable events are:
+
+    mouseover: when mouseover a given area to get an event
+    mouseout:  opposite of mouseover, when you exit a given area to get an event
+    keyup:     when user presses up on keyboard to get an event. 
+    keydown:     when user presses down on their keys to get an event.
+    keypress:    when user presses on keyboard in general to get an event. 
+
+  can listen for an event with addEventListener(), which takes 2 events:
+    1. a string argument which is the event i am looking for (such as click)
+    2. a callback function that determines what should happen when the event takes place. 
+        within parameters of the callback, get access to data about the event from the event object. the 'event' is an object and 
+        includes info about the event itself. the most important info that comes from the event is target. target tells me on what element
+        the user clicked during the event. 
+ */
+
+//event listener will work on 1st click only. will not console log text when user clicks 2 other posts. 
+const post = document.querySelector(".post") 
+post.addEventListener('click', event => {  //event object grants access to the data
+  //console.log(event)   //returns MouseEvent once mouse is clicked
+  //console.log(event.target)   //returns <p>, which is the element user clicked during event 
+  console.log('Do you want to edit this post?') //returns 'Do you want to edit this post?' on user 1st click but not after addtl clicks 
+}) 
+
+/*need to update app to ask user the text from console when user clicks more than 1 post. this program will not work because 
+ cannot setup an event listener on a NodeList. but can set up an event listener for an individual DOM element. 
+ */
+const posts = document.querySelectorAll(".post")  //returns all of the divs with post
+posts.addEventListener('click', event => {
+//   console.log(event.target)   
+  console.log('Do you want to edit this post?')
+}) 
+
+/*need to update app to ask user 'Do you want to edit this post?' when user clicks more than 1 post. this program will work because 
+ can take the post NodeList and iterate over it using forEach() to get each post. in the body of forEach() can create an 
+ event listener for each of the posts. clicking on any of the posts, any number of times, will return the expected log message
+ Do you want to edit this post?
+ 
+ the challenge with querySelectorAll() is that it will only provide the 'posts' (variable) when it 1st queries for it, meaning 
+ querySelectorAll() provides a static list. if i were to add a new post dynamically via javascript, querySelectorAll() will not
+ detect the new post. consequently the click event will not register for future posts. 
+
+ this approach registers event on individual post from querySelectorAll()...post.addEventListener('click'...
+ */
+const posts = document.querySelectorAll(".post") 
+posts.forEach(post => {  
+  post.addEventListener('click', event => {
+  //   console.log(event.target)   
+    console.log('Do you want to edit this post?')
+  }) 
+})
+
+/* instead of registering events on individual posts from querySelectorAll(), put event listener on the document body, get 'event' 
+data and console log 'Do you want to edit this post?'.  with this approach user will get message anywhere they click on the page. 
+user will get log message anywhere they click on the page, even elements other than the posts. 
+ */
+document.body.addEventListener('click', event => {
+    console.log('Do you want to edit this post?')  
+  })
+
+/* need to provide logic within callback to check to see if user is clicking on a post message. possibly use matches() method to see if 
+an element matches the post class such as el.matches('.post').  currently do not have an element for this. but do have the element that
+comes from event.target. (target tells me on what element the user clicked during the event). so i can check if event.target matches
+post: 
+    event.target.matches('.post') 
+
+    event is from arrow function and grants access to data, target will return element where user clicked, matches() will check post
+    against the element from target.
+
+you would expect this approach to work but the problem is due to the nature of matches().
+matches() gives an exact match. when clicking on each post and logging event.target, wil not give the parent div, <div class="post">.
+instead was giving <h2> or <p>. so would only show message if i clicked in a particular area within the confines of post. 
+need the closest parent element in order to work. 
+ */
+document.body.addEventListener('click', event => {
+    if (!event.target.matches('.post')) return 
+    
+    console.log('Do you want to edit this post?')  
+  })
+
+/* instead of matches(), can use method closest(). closest() is a very helpful method available on elements. closest() enables me to click
+anywhere within the confines of a post, whether title or paragraph, get text 'Do you want to edit this post?'
+ */
+document.body.addEventListener('click', event => {
+    if (!event.target.closest('.post')) return  //if element from target is does not match post, do nothing, if does, print log
+    
+    console.log('Do you want to edit this post?')  
+  })
+
+
+
+ /*
+Challenge
+1. Select h1 and add a click event listener. Log the text from the element to the console.
+
+2. Add the same functionality to all the elements displayed in web browser. 
+Finally, try to trigger the event when you hover the mouse over the elements, instead of when clicking on them*/
+
+const title = document.querySelector('h1') 
+title.addEventListener('click', event => {
+  console.log(event.target.textContent) 
+}) 
+
+document.body.addEventListener('mouseover', event => {
+  console.log(event.target.textContent) 
+}) 
