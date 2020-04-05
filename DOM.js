@@ -280,8 +280,6 @@ document.body.addEventListener('click', event => {
     console.log('Do you want to edit this post?')  
   })
 
-
-
  /*
 Challenge
 1. Select h1 and add a click event listener. Log the text from the element to the console.
